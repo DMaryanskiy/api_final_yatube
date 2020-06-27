@@ -29,8 +29,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOrReadOnly,]
 
     def perform_create(self, serializer):
-        post = get_object_or_404(Post, id=self.kwargs['post_id'])
-        serializer.save(author=self.request.user, post=post)
+        serializer.save(author=self.request.user)
     
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs['post_id'])
@@ -47,7 +46,7 @@ class FollowList(generics.ListCreateAPIView):
         try:
             following = User.objects.get(username=self.request.data.get('following'))
             exists = Follow.objects.filter(user=self.request.user, following=following).exists()
-            if self.request.user == self.request.data.get('following'):
+            if self.request.user == following:
                 raise ValidationError('You can not follow yourself')
 
             if exists:
